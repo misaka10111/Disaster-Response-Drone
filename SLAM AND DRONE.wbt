@@ -1,0 +1,257 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/Floor.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/bitcraze/crazyflie/protos/Crazyflie.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/obstacles/protos/OilBarrel.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/buildings/protos/LargeResidentialTower.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/rocks/protos/Rock.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/buildings/protos/Barn.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/buildings/protos/FastFoodRestaurant.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/trees/protos/Cypress.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/balls/protos/Ball.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/factory/containers/protos/WoodenBox.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/animals/protos/Cat.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/road/protos/StraightRoadSegment.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/road/protos/RoadLine.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/buildings/protos/SimpleTwoFloorsHouse.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/trees/protos/Tree.proto"
+EXTERNPROTO "../protos/Pedestrian.proto"
+
+WorldInfo {
+}
+Viewpoint {
+  orientation 0.24367663270496082 -0.16787828429887083 -0.9552165096638766 4.3056579751756825
+  position 1.8907373085495198 -5.051140070570197 3.058066326180939
+}
+TexturedBackground {
+}
+Pedestrian {
+}
+TexturedBackgroundLight {
+}
+Floor {
+  size 30 30
+}
+StraightRoadSegment {
+  translation -5 1 0
+  rotation -0.7071067811865475 0 0.7071067811865475 0
+  width 0.7
+  lines [
+    RoadLine {
+      width 0.1
+    }
+  ]
+  roadBorderHeight 0.02
+  startingRoadBorderWidth 0.1
+  endingRoadBorderWidth 0.1
+  length 4
+}
+WoodenBox {
+  translation -0.64784 0.28301 0.1
+  size 0.05 0.07 0.2
+}
+WoodenBox {
+  translation -0.800657 -0.502354 0.1
+  name "wooden box(3)"
+  size 0.05 0.07 0.2
+}
+WoodenBox {
+  translation -0.796114 -0.556665 0.14
+  rotation 1 0 0 4.6928012867022945e-06
+  name "wooden box(8)"
+  size 0.03 0.04 0.1
+}
+WoodenBox {
+  translation -0.799714 -0.446376 0.14
+  rotation 1 0 0 4.6928012867022945e-06
+  name "wooden box(9)"
+  size 0.03 0.04 0.1
+}
+WoodenBox {
+  translation 0.234865 -0.904656 0.1
+  rotation 0 0 1 -1.047195307179586
+  name "wooden box(7)"
+  size 0.05 0.07 0.2
+}
+WoodenBox {
+  translation -0.645944 0.32849 0.14
+  name "wooden box(1)"
+  size 0.03 0.04 0.1
+}
+WoodenBox {
+  translation -0.647638 0.236272 0.14
+  name "wooden box(2)"
+  size 0.03 0.04 0.1
+}
+WoodenBox {
+  translation -0.647638 0.236272 0.14
+  name "wooden box(5)"
+  size 0.03 0.04 0.1
+}
+WoodenBox {
+  translation 0.281238 -0.872834 0.14
+  rotation 1.3546999999950276e-06 -2.3464099999913877e-06 0.9999999999963296 2.0944
+  name "wooden box(4)"
+  size 0.03 0.04 0.1
+}
+WoodenBox {
+  translation 0.190797 -0.933141 0.14
+  rotation 1.3546999999950276e-06 -2.3464099999913877e-06 0.9999999999963296 2.0944
+  name "wooden box(6)"
+  size 0.03 0.04 0.1
+}
+Ball {
+  translation -0.648608 0.283527 0.2325
+}
+Ball {
+  translation -0.800245 -0.502865 0.2325
+  name "ball(1)"
+}
+Ball {
+  translation 0.230453 -0.905413 0.2325
+  name "ball(2)"
+}
+Crazyflie {
+  rotation 0 0 1 1.5708
+  controller "drone control"
+}
+OilBarrel {
+  translation -0.16948 -0.115739 0.03
+  height 0.05
+  radius 0.02
+}
+OilBarrel {
+  translation -0.0685154 -0.197283 0.03
+  name "oil barrel(1)"
+  height 0.05
+  radius 0.02
+}
+LargeResidentialTower {
+  translation -3.46636 2.24277 0.01
+  rotation 0 0 1 -1.5708053071795867
+  scale 0.05
+}
+LargeResidentialTower {
+  translation 0.415312 0.74412 0.01
+  rotation 0 0 1 0.523599
+  name "residential tower(1)"
+  scale 0.07
+}
+Rock {
+  translation 0.285581 -1.68242 1.11023e-15
+  type "flat"
+  scale 2
+}
+Rock {
+  translation 1.85502 0.785397 1.99841e-15
+  name "rock(5)"
+  type "flat"
+  scale 2
+}
+Rock {
+  translation 1.2192 1.59644 1.13242e-14
+  name "rock(4)"
+  type "flat"
+  scale 2
+}
+Rock {
+  translation -0.830695 4.23457 -1.84297e-14
+  name "rock(2)"
+  type "flat"
+  scale 2
+}
+Rock {
+  translation 1.3135 -0.346401 -2.22042e-16
+  name "rock(1)"
+  type "flat"
+  scale 3
+}
+Rock {
+  translation -1.40482 -1.66198 -2.14717e-13
+  name "rock(3)"
+  type "flat"
+  scale 3
+}
+Barn {
+  translation -0.452837 -1.10698 0
+  rotation 0 0 1 -0.785395307179586
+  scale 0.05
+}
+Barn {
+  translation -1.59699 3.16889 -0.03
+  rotation 0 0 -1 0.261797
+  scale 0.05
+  name "barn(1)"
+}
+FastFoodRestaurant {
+  translation 0.0853487 2.94927 6.30606e-14
+  rotation 0 0 1 -2.094395307179586
+  height 7
+  scale 0.08
+}
+FastFoodRestaurant {
+  translation -1.66356 -0.129198 6.30606e-14
+  name "fast food restaurant(1)"
+  height 6
+  scale 0.08
+}
+Cypress {
+  translation 1.41505 -1.2146 -8.88178e-16
+  scale 0.15
+}
+Cypress {
+  translation 1.91708 2.38934 -3.55271e-15
+  name "cypress tree(4)"
+  scale 0.25
+}
+Cypress {
+  translation 0.878027 3.36288 -3.55271e-15
+  name "cypress tree(5)"
+  scale 0.25
+}
+Cypress {
+  translation -0.389876 0.876177 -0.01
+  rotation 0 0 1 -0.785395307179586
+  name "cypress tree(1)"
+  scale 0.15
+}
+Cypress {
+  translation 0.738162 -1.48458 -0.01
+  rotation 0 0 1 -0.785395307179586
+  name "cypress tree(3)"
+  scale 0.15
+}
+Cypress {
+  translation -0.995854 -0.698402 -0.01
+  rotation 0 0 1 -0.785395307179586
+  name "cypress tree(2)"
+  scale 0.15
+}
+Cat {
+  translation -0.7726 -0.0293935 -1.11022e-16
+  scale 0.3
+}
+SimpleTwoFloorsHouse {
+  translation -1.80149 2.17454 -2.22045e-15
+  scale 0.05
+}
+SimpleTwoFloorsHouse {
+  translation -3.22162 -0.328063 -6.21725e-15
+  rotation 0 0 1 1.5708
+  scale 0.07
+  name "simple two-storey house(1)"
+}
+Tree {
+  translation 3 0 0
+  scale 0.2 0.2 1
+}
+Tree {
+  translation 3 1 0
+  name "tree(4)"
+  scale 0.2 0.2 1
+}
+Pedestrian {
+  name "pedestrian(1)"
+}
