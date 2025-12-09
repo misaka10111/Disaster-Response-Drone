@@ -16,6 +16,9 @@ class PID:
         self.past_roll_error = 0.0
         self.altitude_integrator = 0.0
         self.last_time = 0.0
+        # edit: DM
+        self.current_goal = None
+        self.test_waypoints = [...]
 
     def pid(self, dt, desired_vx, desired_vy, desired_yaw_rate, desired_altitude,
             actual_roll, actual_pitch, actual_yaw_rate,
@@ -148,8 +151,15 @@ class DroneController:
     def _read_goal(self):
         if not os.path.exists(self.goal_file):
             return None
-        with open(self.goal_file, 'r', encoding='utf-8') as f:
-            return json.load(f)
+        # edit: DM
+        try:
+            with open(self.goal_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                return data.get('waypoints', [])
+        except:
+            return None
+        # with open(self.goal_file, 'r', encoding='utf-8') as f:
+        #     return json.load(f)
 
     def _get_altitude(self):
         if self.gps:
@@ -214,6 +224,7 @@ class DroneController:
             
             elif key == ord('G'):
                 self.waypoint_index = 0  # 重置路径点索引
+                self.current_goal = None  # edit: DM 允许重新加载新任务
                 self.state = 'GOTO'
 
             if self.state == 'MANUAL':
@@ -279,6 +290,14 @@ class DroneController:
                 desired_yaw_rate = self.manual_yaw_rate_cmd
                 
             elif self.state == 'GOTO':
+                # edit: DM
+                if self.waypoint_index == 0 and not self.current_goal:
+                    external_mission = self._read_goal()
+                    if external_mission:
+                        print("收到 Jiaqi 的任务指令，开始执行。")
+                        self.test_waypoints = external_mission  # 覆盖原有路径
+                        self.current_goal = True  # 标记已加载
+
                 if self.waypoint_index < len(self.test_waypoints):
                     current_wp = self.test_waypoints[self.waypoint_index]
                     desired_altitude = float(current_wp.get('altitude', desired_altitude))
