@@ -91,7 +91,7 @@ class DroneSLAM:
         else:
             self.occupancy[gy, gx] = 0
 
-    # Bresenham ray algorith
+    # Bresenham ray algorithm
 
     def _bresenham(self, x0, y0, x1, y1):
        #Bresenham line on integer grid, returns list of (gx, gy).
@@ -119,7 +119,7 @@ class DroneSLAM:
     # Single range fusion + clearing near robot
 
     def _clear_robot_nearby(self):
-        #Mark a small circle around the robot as free each step to avoid treating the robot itself as an obstacle.
+        #Mark a small circle around the robot as free each step to avoid treating the robot think itself as an obstacle.
         gx0, gy0 = self.world_to_grid(self.x, self.y)
         radius_m = 0.1  # Physical radius
         r_cells = int(radius_m / self.RESOLUTION) + 1
@@ -223,7 +223,7 @@ class DroneSLAM:
             if self.grid_in_bounds(gx, gy):
                 img[gy, gx] = (0, 255, 0)
 
-        # Building centers: blue dots + B1/B2/...
+        # Building centers: blue dots + B1/B2/
         for idx, (gx_b, gy_b, area) in enumerate(self.buildings, start=1):
             cv2.circle(img, (gx_b, gy_b), 2, (255, 0, 0), -1)
             cv2.putText(
@@ -247,7 +247,7 @@ class DroneSLAM:
         cv2.imshow("Drone SLAM Map", img_big)
         cv2.waitKey(1)
 
-    # ------------------ Main update ------------------
+    # Main update
 
     def update(self):
         self.step_count += 1
