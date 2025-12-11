@@ -1,5 +1,4 @@
 import matplotlib.animation as animation
-import numpy as np
 
 
 def animate_uav_path(ax, path, interval=80):

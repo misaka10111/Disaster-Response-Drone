@@ -18,20 +18,20 @@ def uav_topdown_disaster_map(img_path, meters_per_pixel=0.12, cell_size_m=5.0):
     result = detect_objects(img_rgb)
     debris_mask = detect_debris_unsupervised(img_rgb)
 
-    # 1) 初始化纯白底图
-    base = np.ones((H, W, 3), float)  # 全 1 → 纯白（RGB = 1,1,1）
+    # 1) Initialize pure white base image
+    base = np.ones((H, W, 3), float)  # All 1s → pure white (RGB = 1,1,1)
 
-    # 2) 计算废墟概率图（平滑处理）
+    # 2) Calculate debris probability map (with smoothing)
     debris_prob = cv2.GaussianBlur(debris_mask.astype(float), (45, 45), 0)
     if debris_prob.max() > 0:
         debris_prob /= debris_prob.max()
 
-    # 3) 废墟区域的黄色
+    # 3) Yellow color for debris areas
     debris_color = np.array([225, 195, 110]) / 255.0
 
-    # 4) 把白底 + 黄废墟融合
+    # 4) Blend white base + yellow debris
     colored = base.copy()
-    for c in range(3):  # 3 个颜色通道
+    for c in range(3):  # 3 color channels
         colored[..., c] = (
                 base[..., c] * (1 - debris_prob * 0.8)+
                 debris_color[c] * (debris_prob * 0.9)

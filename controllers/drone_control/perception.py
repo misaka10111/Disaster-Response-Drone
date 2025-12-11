@@ -1,6 +1,5 @@
 import torch
 import cv2
-import numpy as np
 
 class PerceptionModule:
     def __init__(self, model_path="yolov5s.pt"):
