@@ -1,0 +1,6 @@
+train: C:/Users/lanre/OneDrive/Desktop/dataset/images/train
+val: C:/Users/lanre/OneDrive/Desktop/dataset/images/val
+test: C:/Users/lanre/OneDrive/Desktop/dataset/images/test
+
+nc: 2
+names: ["person", "cat"]
