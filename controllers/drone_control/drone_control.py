@@ -116,7 +116,6 @@ class DroneSLAM:
         return points
 
     # Single range fusion + clearing near robot
-
     def _clear_robot_nearby(self):
         #Mark a small circle around the robot as free each step to avoid treating the robot think itself as an obstacle.
         gx0, gy0 = self.world_to_grid(self.x, self.y)
@@ -189,7 +188,6 @@ class DroneSLAM:
                 self._update_log_odds_cell(gx, gy, self.L_FREE_UPDATE * 0.7)
 
     # Building detection + visualization
-
     def _detect_buildings(self):
         # Use morphological closing to make obstacle contours more complete
         binary = (self.occupancy == 2).astype(np.uint8)
@@ -247,7 +245,6 @@ class DroneSLAM:
         cv2.waitKey(1)
 
     # Main update
-
     def update(self):
         self.step_count += 1
 
@@ -305,8 +302,7 @@ class DroneSLAM:
         cv2.destroyAllWindows()
 
 
-# 控制部分
-
+# Proportional-Integral-Derivative Control
 class PID:
     # pid controller
     def __init__(self):
@@ -409,7 +405,7 @@ class DroneController:
                 self.range_back.enable(self.timestep)
         except Exception:
             self.range_back = None
-            print("[SLAM] WARNING: 找不到 range_back 传感器，可选。")
+            print("[SLAM] WARNING: cannot find range_back sensor")
 
         self.camera = self.robot.getDevice('camera')
         if self.camera:
@@ -435,7 +431,7 @@ class DroneController:
         self.goal_file = os.path.join(os.path.dirname(__file__), 'control_goal.json')
         self.current_goal = None
 
-        # 测试轨迹
+        # Test trajectory
         self.test_waypoints = [
             {"position": [1.5, 0.0, 1.2], "altitude": 1.2},
             {"position": [2.0, 1.0, 1.5], "altitude": 1.5},
@@ -457,7 +453,7 @@ class DroneController:
         self.takeoff_phase = True
         self.takeoff_duration = 3.0  # 3 seconds
 
-        # 初始化 SLAM
+        # Initialize SLAM
         self.slam = None
         if self.gps and self.imu and self.range_front and self.range_left and self.range_right:
             self.slam = DroneSLAM(
@@ -473,6 +469,32 @@ class DroneController:
             )
         else:
             print("[SLAM] Missing key signals(gps/imu/range_xx), SLAM not started")
+
+    # Take photo
+    def _save_snapshot(self):
+        if not self.camera:
+            print("Camera not activated")
+            return
+
+        # 1. Obtain the original image data (BGRA form)
+        raw_image = self.camera.getImage()
+        if raw_image:
+            width = self.camera.getWidth()
+            height = self.camera.getHeight()
+
+            # 2. Convert to numpy array
+            img_array = np.frombuffer(raw_image, np.uint8).reshape((height, width, 4))
+
+            # 3. Remove the Alpha channel and retain BGR (the default format of OpenCV)
+            img_bgr = img_array[:, :, :3]
+
+            # 4. Save file
+            filename = "scan_result.jpg"
+            cv2.imwrite(filename, img_bgr)
+            print(f"Photo has save as {filename}")
+        else:
+            print("Cannot obtain image data")
+
 
     def _read_goal(self):
         if not os.path.exists(self.goal_file):

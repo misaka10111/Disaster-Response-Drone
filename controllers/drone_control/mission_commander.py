@@ -38,7 +38,7 @@ class MissionCommander:
         result = detect_objects(img_rgb)
 
         persons = []
-        print(f"📊检测到 {len(result.boxes)} 个物体")
+        print(f" {len(result.boxes)} objects detected.")
 
         # 3. 提取幸存者坐标 (逻辑来自 SLAM.py)
         for box in result.boxes:
@@ -51,16 +51,16 @@ class MissionCommander:
                 cx = (x1 + x2) / 2 * self.meters_per_pixel
                 cy = (y1 + y2) / 2 * self.meters_per_pixel
                 persons.append((cx, cy))
-                print(f"   -> 发现幸存者 @ ({cx:.2f}m, {cy:.2f}m)")
+                print(f"find survivor at ({cx:.2f}meters, {cy:.2f}meters)")
 
         if not persons:
-            print("⚠️未发现幸存者，任务取消或执行默认盘旋。")
+            print("No survivors were found. The mission is cancelled or the default hover is executed")
             return []
 
         # 4. 路径规划 (使用 pathfinding.py)
         # 假设无人机从 (0,0) 出发
         start_pos = (0, 0)
-        print(f"🗺️正在规划路径: 起点 {start_pos} -> {len(persons)} 个目标")
+        print(f"🗺️Planning path: starting point {start_pos} -> {len(persons)} objects.")
 
         # 获取一系列密集的路径点 [(x,y), (x,y)...]
         raw_path = move_robot_toward_multiple_targets(start_pos, persons, step_size=0.5)
@@ -92,10 +92,10 @@ class MissionCommander:
         try:
             with open(self.goal_file, 'w', encoding='utf-8') as f:
                 json.dump(mission_data, f, indent=4)
-            print(f"✅任务已下发! 包含 {len(waypoints)} 个航点。")
-            print(f"👉现在请在 Webots 窗口中点击画面并按 'G' 键开始执行。")
+            print(f"mission dispatched; contain {len(waypoints)} waypoints")
+            print(f"press 'G' to start executing")
         except Exception as e:
-            print(f"❌下发失败 - {e}")
+            print(f"dispatch failed - {e}")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,4 @@
 from ultralytics import YOLO
-import numpy as np
 
 # High-level colors for semantic classes
 CATEGORY_COLORS = {
