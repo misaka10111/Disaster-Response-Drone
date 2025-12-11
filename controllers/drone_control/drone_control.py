@@ -4,8 +4,7 @@ import os
 import json
 import numpy as np
 import cv2
-import subprocess
-import sys
+
 
 class DroneSLAM:
 
@@ -473,6 +472,12 @@ class DroneController:
         else:
             print("[SLAM] Missing key signals(gps/imu/range_xx), SLAM not started")
 
+        # search mode variables
+        self.search_waypoints = self._generate_search_pattern()
+        self.search_index = 0
+        self.is_scanning = False
+        self.scan_timer = 0.0  # timer, used for hovering and taking photos
+
     # Take photo
     def _save_snapshot(self):
         if not self.camera:
@@ -524,14 +529,14 @@ class DroneController:
             rpy = self.imu.getRollPitchYaw()
             if rpy:
                 return rpy
-        return (0.0, 0.0, 0.0)
+        return 0.0, 0.0, 0.0
 
     def _get_gyro(self):
         if self.gyro:
             gyro_vals = self.gyro.getValues()
             if gyro_vals:
                 return gyro_vals
-        return (0.0, 0.0, 0.0)
+        return 0.0, 0.0, 0.0
 
     def _get_body_velocity(self, dt):
         if not self.gps or dt <= 0:
@@ -573,18 +578,18 @@ class DroneController:
                 self.target_alt = self._get_altitude()
 
             elif key == ord('G'):
-                print("[Controller] Triggering Mission Commander...")
+                print("[Controller] Initial scan initiated...")
 
-                try:
-                    subprocess.run([sys.executable, "mission_commander.py"], check=True)
-                    print("[Controller] Mission plan updated successfully.")
-                except Exception as e:
-                    print(f"[Controller] Failed to run mission commander: {e}")
-
-                self.waypoint_index = 0  # reset waypoint index
-                self.current_goal = None
-                self.state = 'GOTO'
-                print("[Controller] switch to GOTO mode, ready to receive instructions...")
+                # try to test it in place once firstly
+                if self._run_mission_detection():
+                    print("[Controller] Target found immediately!")
+                    self.state = 'GOTO'
+                    self.current_goal = None
+                else:
+                    print("[Controller] No target found. Starting SEARCH PATTERN.")
+                    self.state = 'SEARCHING'
+                    self.search_index = 0
+                    self.is_scanning = False
 
             if self.state == 'MANUAL':
                 step = 0.12
@@ -619,6 +624,61 @@ class DroneController:
             self.takeoff_phase = False
             return self.target_alt
         return self.target_alt
+
+    def _generate_search_pattern(self):
+        """
+        Generate a serpentine path that covers the search area
+        """
+        waypoints = []
+        x_start, x_end = -2.0, 2.0
+        y_start, y_end = -2.0, 2.0
+        step = 1.0  # search step
+        altitude = 1.5
+
+        y = y_start
+        direction = 1  # 1 right, -1 left
+
+        while y <= y_end:
+            # Determine the starting and ending points of the journey based on the direction
+            if direction == 1:
+                row_points = np.arange(x_start, x_end + 0.1, step)
+            else:
+                row_points = np.arange(x_end, x_start - 0.1, -step)
+
+            for x in row_points:
+                waypoints.append({"position": [x, y, altitude], "altitude": altitude})
+
+            y += step
+            direction *= -1  # change direction
+
+        print(f"[Search] Generated {len(waypoints)} search points.")
+        return waypoints
+
+    def _run_mission_detection(self):
+        """
+        Run mission_commander.py and check if there are any results
+        Return: True (Found target), False (Not found)
+        """
+        # 1. delete old files
+        if os.path.exists(self.goal_file):
+            try:
+                os.remove(self.goal_file)
+            except:
+                pass
+
+        # 2. Call an external script
+        import subprocess, sys
+        try:
+            subprocess.run([sys.executable, "mission_commander.py"], check=True)
+        except Exception as e:
+            print(f"Error running mission commander: {e}")
+            return False
+
+        # 3. read result
+        mission_data = self._read_goal()
+        if mission_data and len(mission_data) > 0:
+            return True
+        return False
 
     def run(self):
         # Initialize the motor
@@ -714,6 +774,71 @@ class DroneController:
                         desired_vy = max(-0.5, min(0.5, k_goto * ey_body))
                 else:
                     self.state = 'HOVER'
+
+            elif self.state == 'SEARCHING':
+                # 1. Check if the search is complete
+                if self.search_index >= len(self.search_waypoints):
+                    print("[Search] Area scanned completely. No targets found. Landing.")
+                    self.state = 'HOVER'
+                    self.target_alt = 0.0  # landing
+                    continue
+
+                # Get the search point you are currently going to
+                target_wp = self.search_waypoints[self.search_index]
+                desired_altitude = target_wp['altitude']
+
+                # Calculate the distance
+                pos = self.gps.getValues()
+                dist = math.sqrt((target_wp['position'][0] - pos[0]) ** 2 +
+                                 (target_wp['position'][1] - pos[1]) ** 2)
+
+                # 2. Flight logic ( towards the search point)
+                if dist > 0.2 and not self.is_scanning:
+                    # not arrived
+                    tx, ty, _ = target_wp['position']
+                    ex = tx - pos[0]
+                    ey = ty - pos[1]
+
+                    # Machine coordinate conversion (for control)
+                    _, _, yaw_curr = self._get_rpy()
+                    cos_y = math.cos(yaw_curr)
+                    sin_y = math.sin(yaw_curr)
+                    desired_vx = 0.5 * (ex * cos_y + ey * sin_y)
+                    desired_vy = 0.5 * (-ex * sin_y + ey * cos_y)
+
+                    # Limit speed
+                    desired_vx = max(-0.5, min(0.5, desired_vx))
+                    desired_vy = max(-0.5, min(0.5, desired_vy))
+                    desired_yaw_rate = 0.0
+
+                # 3. Arrival (stop -> look -> go)
+                else:
+                    desired_vx = 0.0
+                    desired_vy = 0.0
+
+                    if not self.is_scanning:
+                        print(f"[Search] Arrived at point {self.search_index}. Scanning...")
+                        self.is_scanning = True
+                        self.scan_timer = current_time
+
+                    # take photo
+                    if current_time - self.scan_timer > 2.0:
+                        self._save_snapshot()
+
+                        # call Mission Commander
+                        print("[Search] Analyzing image...")
+                        found_target = self._run_mission_detection()
+
+                        if found_target:
+                            print("[Search] !!! TARGET FOUND !!! Switching to GOTO.")
+                            self.state = 'GOTO'
+                            self.waypoint_index = 0
+                            self.current_goal = None  # Trigger the read logic in GOTO
+                            self.is_scanning = False  # reset flag
+                        else:
+                            print("[Search] Nothing here. Moving to next point.")
+                            self.search_index += 1
+                            self.is_scanning = False  # reset flag
 
             # PID output
             if self.motors and len(self.motors) == 4:
