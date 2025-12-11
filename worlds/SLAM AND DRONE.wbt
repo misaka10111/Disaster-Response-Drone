@@ -112,7 +112,7 @@ Ball {
 }
 Crazyflie {
   rotation 0 0 1 1.5708
-  controller "drone_control"
+  controller "<extern>"
 }
 OilBarrel {
   translation -0.16948 -0.115739 0.03
