@@ -479,7 +479,7 @@ class DroneController:
         self.scan_timer = 0.0  # timer, used for hovering and taking photos
 
     # Take photo
-    def _save_snapshot(self):
+    def _save_snapshot(self, save_to_dataset=True):
         if not self.camera:
             print("Camera not activated")
             return
@@ -500,6 +500,20 @@ class DroneController:
             filename = "scan_result.jpg"
             cv2.imwrite(filename, img_bgr)
             print(f"Photo has save as {filename}")
+
+            # save photo for training
+            if save_to_dataset:
+                dataset_dir = "yolo_dataset"
+                if not os.path.exists(dataset_dir):
+                    os.makedirs(dataset_dir)
+
+                timestamp = f"{self.robot.getTime():.2f}"
+                filename = os.path.join(dataset_dir, f"img_{timestamp}.jpg")
+
+                cv2.imwrite(filename, img_bgr)
+                print(f"[Dataset] Image saved: {filename}")
+            else:
+                print("Cannot obtain image data")
         else:
             print("Cannot obtain image data")
 
