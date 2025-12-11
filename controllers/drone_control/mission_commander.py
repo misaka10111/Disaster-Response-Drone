@@ -84,8 +84,8 @@ class MissionCommander:
         return formatted_waypoints
 
     def dispatch_mission(self, waypoints):
-        if not waypoints:
-            return
+        if waypoints is None:
+            waypoints = []
 
         mission_data = {
             "timestamp": time.time(),
@@ -96,8 +96,12 @@ class MissionCommander:
         try:
             with open(self.goal_file, 'w', encoding='utf-8') as f:
                 json.dump(mission_data, f, indent=4)
-            print(f"mission dispatched; contain {len(waypoints)} waypoints")
-            print(f"press 'G' to start executing")
+
+            if not waypoints:
+                print(f"Mission dispatched: NO TARGETS")
+            else:
+                print(f"mission dispatched; contain {len(waypoints)} waypoints")
+
         except Exception as e:
             print(f"dispatch failed - {e}")
 

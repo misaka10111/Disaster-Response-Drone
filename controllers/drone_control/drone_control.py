@@ -668,12 +668,18 @@ class DroneController:
             elif self.state == 'GOTO':
                 if self.waypoint_index == 0 and not self.current_goal:
                     external_mission = self._read_goal()
-                    if external_mission:
-                        self.test_waypoints = external_mission
+
+                    if external_mission is not None:
                         self.current_goal = True
-                        print(f"Mission loaded: {len(external_mission)} waypoints")
-                    else:
-                        pass
+
+                        if len(external_mission) > 0:
+                            self.test_waypoints = external_mission
+                            print(f"Mission loaded: {len(external_mission)} waypoints")
+                        else:
+                            print("[Controller] Empty mission detected. Hovering.")
+                            self.test_waypoints = []
+                            self.state = 'HOVER'
+                            continue
 
                 # execute the waypoint flight logic
                 if self.waypoint_index < len(self.test_waypoints):
