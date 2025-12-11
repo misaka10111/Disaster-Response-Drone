@@ -370,6 +370,7 @@ class PID:
 class DroneController:
     def __init__(self):
         # Initialize the robot
+        self.has_scanned = False
         self.robot = Robot()
         self.timestep = int(self.robot.getBasicTimeStep()) or 32
 
@@ -507,8 +508,7 @@ class DroneController:
         except Exception as e:
             print(f"[Controller] Failed to read the task file: {e}")
             return None
-        # with open(self.goal_file, 'r', encoding='utf-8') as f:
-        #     return json.load(f)
+
 
     def _get_altitude(self):
         if self.gps:
@@ -618,6 +618,12 @@ class DroneController:
             for _ in range(5):
                 self.robot.step(self.timestep)
 
+        self.state = 'HOVER'
+        self.target_alt = 1.5
+        self.prev_time = self.robot.getTime()
+
+        self.has_scanned = False
+
         while self.robot.step(self.timestep) != -1:
             current_time = self.robot.getTime()
             dt = current_time - self.prev_time
@@ -630,7 +636,20 @@ class DroneController:
             _, _, yaw_rate = self._get_gyro()
             vx_body, vy_body = self._get_body_velocity(dt)
 
-            desired_altitude = self.target_alt  # Use the target height directly
+            if self.state == 'HOVER' and not self.has_scanned and current_time > 7.0:
+                print(f"hovering (height {alt:.2f}m), taking photo...")
+
+                self._save_snapshot()
+                self.has_scanned = True
+
+                print("photo saved as scan_result.jpg")
+                print("press 'G' to start mission")
+
+            desired_altitude = self.target_alt
+            desired_vx = 0.0
+            desired_vy = 0.0
+            desired_yaw_rate = 0.0
+
             if self.state == 'MANUAL':
                 k_vel = 0.6  # Velocity mapping coefficient
                 desired_vx = -self.manual_pitch_cmd * k_vel
@@ -643,64 +662,50 @@ class DroneController:
                     if external_mission:
                         self.test_waypoints = external_mission
                         self.current_goal = True
-                        print("[Controller] mission loaded, start executing")
+                        print(f"✈Mission loaded: {len(external_mission)} waypoints")
+                    else:
+                        pass
 
+                # execute the waypoint flight logic
                 if self.waypoint_index < len(self.test_waypoints):
                     current_wp = self.test_waypoints[self.waypoint_index]
-                    desired_altitude = float(current_wp.get('altitude', desired_altitude))
+                    desired_altitude = float(current_wp.get('altitude', self.target_alt))
                     desired_yaw_rate = 0.0
 
                     if self.gps:
                         pos = self.gps.getValues()
-                        px, py, pz = pos[0], pos[1], pos[2]
-                        tx, ty, tz = current_wp['position']
+                        px, py = pos[0], pos[1]
+                        tx, ty, _ = current_wp['position']
 
                         ex = tx - px
                         ey = ty - py
                         distance = math.sqrt(ex**2 + ey**2)
 
                         if distance < self.waypoint_threshold:
+                            print(f"arrive waypoint {self.waypoint_index + 1}/{len(self.test_waypoints)}")
                             self.waypoint_index += 1
                             if self.waypoint_index >= len(self.test_waypoints):
+                                print("mission accomplished. hovering")
                                 self.state = 'HOVER'
-                                desired_vx = 0.0
-                                desired_vy = 0.0
 
-                        _, _, yaw = self._get_rpy()
-                        cos_yaw = math.cos(yaw)
-                        sin_yaw = math.sin(yaw)
+                        _, _, yaw_curr = self._get_rpy()
+                        cos_y = math.cos(yaw_curr)
+                        sin_y = math.sin(yaw_curr)
+                        ex_body = ex * cos_y + ey * sin_y
+                        ey_body = -ex * sin_y + ey * cos_y
 
-                        ex_body = ex * cos_yaw + ey * sin_yaw
-                        ey_body = -ex * sin_yaw + ey * cos_yaw
-
-                        k_goto = 0.5
-                        desired_vx = k_goto * ex_body
-                        desired_vy = k_goto * ey_body
-
-                        max_vel = 0.5
-                        desired_vx = max(-max_vel, min(max_vel, desired_vx))
-                        desired_vy = max(-max_vel, min(max_vel, desired_vy))
-
-                    else:
-                        desired_vx = 0.0
-                        desired_vy = 0.0
+                        k_goto = 0.5  # speed coefficient
+                        desired_vx = max(-0.5, min(0.5, k_goto * ex_body))
+                        desired_vy = max(-0.5, min(0.5, k_goto * ey_body))
                 else:
-                    desired_vx = 0.0
-                    desired_vy = 0.0
+                    self.state = 'HOVER'
 
-            else:  # HOVER
-                desired_vx = 0.0
-                desired_vy = 0.0
-                desired_yaw_rate = 0.0
-
+            # PID output
             if self.motors and len(self.motors) == 4:
                 motor_cmds = self.low_level.pid(
-                    dt,
-                    desired_vx, desired_vy, desired_yaw_rate, desired_altitude,
-                    roll, pitch, yaw_rate,
-                    alt, vx_body, vy_body
+                    dt, desired_vx, desired_vy, desired_yaw_rate, desired_altitude,
+                    roll, pitch, yaw_rate, alt, vx_body, vy_body
                 )
-
                 self.motors[0].setVelocity(-motor_cmds[0])
                 self.motors[1].setVelocity(motor_cmds[1])
                 self.motors[2].setVelocity(-motor_cmds[2])
