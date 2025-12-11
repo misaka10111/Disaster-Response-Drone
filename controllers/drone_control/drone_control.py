@@ -4,6 +4,8 @@ import os
 import json
 import numpy as np
 import cv2
+import subprocess
+import sys
 
 class DroneSLAM:
 
@@ -571,6 +573,14 @@ class DroneController:
                 self.target_alt = self._get_altitude()
 
             elif key == ord('G'):
+                print("[Controller] Triggering Mission Commander...")
+
+                try:
+                    subprocess.run([sys.executable, "mission_commander.py"], check=True)
+                    print("[Controller] Mission plan updated successfully.")
+                except Exception as e:
+                    print(f"[Controller] Failed to run mission commander: {e}")
+
                 self.waypoint_index = 0  # reset waypoint index
                 self.current_goal = None
                 self.state = 'GOTO'
@@ -637,13 +647,12 @@ class DroneController:
             vx_body, vy_body = self._get_body_velocity(dt)
 
             if self.state == 'HOVER' and not self.has_scanned and current_time > 7.0:
-                print(f"hovering (height {alt:.2f}m), taking photo...")
+                print(f"Hovering (height {alt:.2f}m), taking photo...")
 
                 self._save_snapshot()
                 self.has_scanned = True
 
-                print("photo saved as scan_result.jpg")
-                print("press 'G' to start mission")
+                print("Press 'G' to start mission")
 
             desired_altitude = self.target_alt
             desired_vx = 0.0
@@ -662,7 +671,7 @@ class DroneController:
                     if external_mission:
                         self.test_waypoints = external_mission
                         self.current_goal = True
-                        print(f"✈Mission loaded: {len(external_mission)} waypoints")
+                        print(f"Mission loaded: {len(external_mission)} waypoints")
                     else:
                         pass
 
@@ -682,10 +691,10 @@ class DroneController:
                         distance = math.sqrt(ex**2 + ey**2)
 
                         if distance < self.waypoint_threshold:
-                            print(f"arrive waypoint {self.waypoint_index + 1}/{len(self.test_waypoints)}")
+                            print(f"Arrive waypoint {self.waypoint_index + 1}/{len(self.test_waypoints)}")
                             self.waypoint_index += 1
                             if self.waypoint_index >= len(self.test_waypoints):
-                                print("mission accomplished. hovering")
+                                print("Mission accomplished. Hovering...")
                                 self.state = 'HOVER'
 
                         _, _, yaw_curr = self._get_rpy()

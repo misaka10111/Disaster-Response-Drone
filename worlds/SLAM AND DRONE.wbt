@@ -16,7 +16,6 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/road/protos/RoadLine.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/buildings/protos/SimpleTwoFloorsHouse.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/trees/protos/Tree.proto"
-EXTERNPROTO "../protos/Pedestrian.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/bitcraze/crazyflie/protos/Crazyflie.proto"
 
 WorldInfo {
@@ -26,8 +25,6 @@ Viewpoint {
   position 1.8907373085495198 -5.051140070570197 3.058066326180939
 }
 TexturedBackground {
-}
-Pedestrian {
 }
 TexturedBackgroundLight {
 }
@@ -248,9 +245,6 @@ Tree {
   name "tree(4)"
   scale 0.2 0.2 1
 }
-Pedestrian {
-  name "pedestrian(1)"
-}
 Crazyflie {
-  controller "drone control"
+  controller "drone_control"
 }

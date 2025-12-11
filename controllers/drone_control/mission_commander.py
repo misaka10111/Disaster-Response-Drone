@@ -40,11 +40,22 @@ class MissionCommander:
             name = result.names[int(box.cls)]
             mapped_class = map_yolo_class(name)
 
+            img_h, img_w, _ = img_rgb.shape
+            center_x = img_w / 2
+            center_y = img_h / 2
+
             if mapped_class == "person":
                 x1, y1, x2, y2 = map(int, box.xyxy[0])
                 # Calculate center point and convert in physical coordinate system
-                cx = (x1 + x2) / 2 * self.meters_per_pixel
-                cy = (y1 + y2) / 2 * self.meters_per_pixel
+                px = (x1 + x2) / 2
+                py = (y1 + y2) / 2
+
+                offset_x_px = px - center_x
+                offset_y_px = center_y - py
+
+                cx = offset_x_px * self.meters_per_pixel
+                cy = offset_y_px * self.meters_per_pixel
+
                 persons.append((cx, cy))
                 print(f"find survivor at ({cx:.2f}meters, {cy:.2f}meters)")
 
@@ -54,7 +65,7 @@ class MissionCommander:
 
         # 4. Path planning (using pathfinding.py)
         start_pos = (0, 0)
-        print(f"🗺️ Planning path: starting point {start_pos} -> {len(persons)} objects.")
+        print(f"Planning path: starting point {start_pos} -> {len(persons)} objects.")
 
         # Get a series of dense path points [(x,y), (x,y)...]
         raw_path = move_robot_toward_multiple_targets(start_pos, persons, step_size=0.5)
