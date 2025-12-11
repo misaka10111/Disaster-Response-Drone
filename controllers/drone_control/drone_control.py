@@ -192,7 +192,7 @@ class DroneSLAM:
     # Building detection + visualization
     def _detect_buildings(self):
         # Use morphological closing to make obstacle contours more complete
-        binary = (self.occupancy == 2).astype(np.uint8)
+        binary = np.asarray(self.occupancy == 2).astype(np.uint8)
         kernel = np.ones((3, 3), np.uint8)
         binary_smooth = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel, iterations=1)
 
