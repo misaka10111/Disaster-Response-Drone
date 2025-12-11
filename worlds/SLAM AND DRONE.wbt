@@ -17,17 +17,14 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/road/protos/RoadLine.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/buildings/protos/SimpleTwoFloorsHouse.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/trees/protos/Tree.proto"
-EXTERNPROTO "../protos/Pedestrian.proto"
 
 WorldInfo {
 }
 Viewpoint {
-  orientation 0.24367663270496082 -0.16787828429887083 -0.9552165096638766 4.3056579751756825
-  position 1.8907373085495198 -5.051140070570197 3.058066326180939
+  orientation 0.24025785935715177 -0.1307123540106506 -0.9618682038232231 4.105815130129297
+  position 2.8909680843702623 -4.786537838256421 2.9961144151054855
 }
 TexturedBackground {
-}
-Pedestrian {
 }
 TexturedBackgroundLight {
 }
@@ -115,7 +112,7 @@ Ball {
 }
 Crazyflie {
   rotation 0 0 1 1.5708
-  controller "drone control"
+  controller "drone_control"
 }
 OilBarrel {
   translation -0.16948 -0.115739 0.03
@@ -251,7 +248,4 @@ Tree {
   translation 3 1 0
   name "tree(4)"
   scale 0.2 0.2 1
-}
-Pedestrian {
-  name "pedestrian(1)"
 }
