@@ -59,3 +59,9 @@ dkms.conf
 
 # idea config
 .idea
+
+# python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
