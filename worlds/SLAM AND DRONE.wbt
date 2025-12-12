@@ -34,30 +34,6 @@ Floor {
     type "dark strip"
   }
 }
-Billboard {
-  children [
-    Shape {
-      appearance PBRAppearance {
-        baseColorMap ImageTexture {
-          url [
-            "../resources/fire.png"
-            ""
-          ]
-        }
-        roughness 1
-        metalness 0
-        emissiveColorMap ImageTexture {
-          url [
-            "../resources/fire.png"
-          ]
-        }
-      }
-      geometry Box {
-        size 1 1 0.1
-      }
-    }
-  ]
-}
 StraightRoadSegment {
   translation -5 1 0
   rotation -0.7071067811865475 0 0.7071067811865475 0
