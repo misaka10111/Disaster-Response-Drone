@@ -14,6 +14,10 @@ class MissionCommander:
         self.map_image_path = "scan_result.jpg"
         self.meters_per_pixel = 0.12 # base on parameter in SLAM.py
 
+        # mark same survivors
+        self.known_survivors = []
+        self.duplicate_threshold = 1.0
+
     def analyze_scene_and_plan(self):
         """
         Call perception module (detector) and path planning module (pathfinding)
@@ -33,6 +37,7 @@ class MissionCommander:
         result = detect_objects(img_rgb)
 
         persons = []
+        current_detections = []
         print(f" {len(result.boxes)} objects detected.")
 
         # 3. Extract survivor coordinates (logic from SLAM.py)
@@ -56,8 +61,21 @@ class MissionCommander:
                 cx = offset_x_px * self.meters_per_pixel
                 cy = offset_y_px * self.meters_per_pixel
 
+                is_new_target = True
+                for existing_survivor in self.known_survivors:
+                    dist = math.hypot(cx - existing_survivor[0], cy - existing_survivor[1])
+                    if dist < self.duplicate_threshold:
+                        is_new_target = False
+                        print(f"Duplicate target ignored (dist={dist:.2f}m)")
+                        break
+
+                if is_new_target:
+                    self.known_survivors.append((cx, cy))
+                    current_detections.append((cx, cy))
+                    print(f"New survivor confirmed at ({cx:.2f}, {cy:.2f})")
+
                 persons.append((cx, cy))
-                print(f"find survivor at ({cx:.2f}meters, {cy:.2f}meters)")
+                print(f"Find survivor at ({cx:.2f}meters, {cy:.2f}meters)")
 
         if not persons:
             print("No survivors were found. The mission is cancelled or the default hover is executed")
