@@ -21,8 +21,8 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/project
 WorldInfo {
 }
 Viewpoint {
-  orientation 0.24367663270496082 -0.16787828429887083 -0.9552165096638766 4.3056579751756825
-  position 1.8907373085495198 -5.051140070570197 3.058066326180939
+  orientation 0.24118859152322572 -0.09724776138682907 -0.9655935667889948 3.884128852754984
+  position 5.565307309703386 -6.152216087737513 4.271182090166208
 }
 TexturedBackground {
 }
@@ -33,6 +33,30 @@ Floor {
   appearance Parquetry {
     type "dark strip"
   }
+}
+Billboard {
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColorMap ImageTexture {
+          url [
+            "../resources/fire.png"
+            ""
+          ]
+        }
+        roughness 1
+        metalness 0
+        emissiveColorMap ImageTexture {
+          url [
+            "../resources/fire.png"
+          ]
+        }
+      }
+      geometry Box {
+        size 1 1 0.1
+      }
+    }
+  ]
 }
 StraightRoadSegment {
   translation -5 1 0

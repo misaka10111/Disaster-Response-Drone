@@ -25,7 +25,7 @@ def map_yolo_class(name: str) -> str:
 
 
 # Load YOLO model globally (so it loads only once)
-_model = YOLO("yolov8n.pt")
+_model = YOLO("best.pt")
 
 
 def detect_objects(img_rgb):
