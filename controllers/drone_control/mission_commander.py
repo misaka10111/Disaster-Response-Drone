@@ -17,13 +17,9 @@ class MissionCommander:
 
         # mark same survivors
         self.known_survivors = []
-        self.duplicate_threshold = 1.0
+        self.duplicate_threshold = 2.0
         self.survivors_file = "found_survivors.json"
-        if os.path.exists(self.survivors_file):
-            with open(self.survivors_file, 'r') as f:
-                self.known_survivors = json.load(f)
-        else:
-            self.known_survivors = []
+        self.known_survivors = []
 
     def analyze_scene_and_plan(self):
         """
@@ -52,7 +48,6 @@ class MissionCommander:
         result = detect_objects(img_rgb)
 
         persons = []
-        current_detections = []
         print(f" {len(result.boxes)} objects detected.")
 
         # Extract survivor coordinates (logic from SLAM.py)
@@ -91,11 +86,9 @@ class MissionCommander:
 
                 if is_new_target:
                     self.known_survivors.append((cx, cy))
-                    current_detections.append((cx, cy))
+                    persons.append((cx, cy))
                     print(f"New survivor confirmed at ({cx:.2f}, {cy:.2f})")
 
-                persons.append((cx, cy))
-                print(f"Find survivor at ({cx:.2f}meters, {cy:.2f}meters)")
 
         if not persons:
             print("No survivors were found.")

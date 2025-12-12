@@ -33,4 +33,4 @@ def detect_objects(img_rgb):
     Run YOLO detection.
     Returns the YOLO result object.
     """
-    return _model(img_rgb)[0]
+    return _model(img_rgb, conf=0.1, classes=[0])[0]

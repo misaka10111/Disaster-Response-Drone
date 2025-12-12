@@ -792,9 +792,9 @@ class DroneController:
             elif self.state == 'SEARCHING':
                 # 1. Check if the search is complete
                 if self.search_index >= len(self.search_waypoints):
-                    print("[Search] Area scanned completely. No targets found. Landing.")
+                    print("[Search] Area scanned completely. No targets found.")
                     self.state = 'HOVER'
-                    self.target_alt = 0.0  # landing
+                    self.target_alt = 1.75
                     continue
 
                 # Get the search point you are currently going to
